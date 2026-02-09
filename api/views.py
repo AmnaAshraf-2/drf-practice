@@ -8,10 +8,7 @@ from .serializers import CarSerializer
 from .models import Car
 
 
-class CarListView(generics.ListAPIView):
-    queryset = Car.objects.all()
-    serializer_class = CarSerializer
-
+# to get all the rows/instances of the model Cars use .all()
 class CarGetView(APIView):
     def get(self, request):
         cars = Car.objects.all()
@@ -19,19 +16,15 @@ class CarGetView(APIView):
         return Response(serializer.data)
 
 
-
+# to get one instance at a time use .get() with pk or id
 class CarGetOneView(APIView):
     def get(self, request, id):
         car = Car.objects.get(id=id)
         serializer = CarSerializer(car)
         return Response(serializer.data)
 
-class CarRetrieveView(generics.RetrieveAPIView):
-    queryset = Car.objects.all()
-    serializer_class = CarSerializer
 
-
-
+# use .get(id=pk) to display the item and .delete() to delete that item
 class CarDeleteView(APIView):
     def get(self,request,pk):
         car = Car.objects.get(id=pk)
@@ -47,12 +40,8 @@ class CarDeleteView(APIView):
         )
 
 
-
-
-class CarCreateView(generics.CreateAPIView):
-   queryset = Car.objects.all()
-   serializer_class = CarSerializer
-
+# use .create() to create a new instance in db for model Car
+# also this bypasses the serializers and manually create an instance
 class CarCreateAPIView(APIView):
     def post(self,request):
         car = Car.objects.create(
@@ -62,6 +51,8 @@ class CarCreateAPIView(APIView):
         )
         return Response(CarSerializer(car).data, status=status.HTTP_201_CREATED)
 
+
+#.get_or_create() adds a check that if the same instance exists it does not create a new instance
 class CarGetOrCreateView(APIView):
     def post(self, request):
         car, created = Car.objects.get_or_create(
@@ -75,8 +66,8 @@ class CarGetOrCreateView(APIView):
         })
 
 
-
-
+# .update_or_create() adds a check so that if a car already exists it updates the fields to new values
+# and if not exist creates a new instance
 class CarUpdateOrCreateView(APIView):
     def post(self, request):
         car, created = Car.objects.update_or_create(
@@ -89,6 +80,8 @@ class CarUpdateOrCreateView(APIView):
             'car': CarSerializer(car).data
         })
 
+
+# this automaticaaly updates the year to 2025 of the cars having the name toyota
 class CarUpdateView(APIView):
     def get(self,request):
         car = Car.objects.filter(make="Toyota")
@@ -100,8 +93,7 @@ class CarUpdateView(APIView):
         return Response({"updated_rows": updated})
 
 
-
-
+# to use .bulk_create() create a list and run a loop to get all the new added data and
 class CarBulkCreateView(APIView):
     def post(self, request):
         cars = [
@@ -110,6 +102,8 @@ class CarBulkCreateView(APIView):
         Car.objects.bulk_create(cars)
         return Response({"message": "Cars created"}, status=201)
 
+
+# .bulk_update() updates multiple instances alltogether. Here only the field year is updated
 class CarBulkUpdateView(APIView):
     def put(self, request):
         cars = []
@@ -121,6 +115,8 @@ class CarBulkUpdateView(APIView):
         Car.objects.bulk_update(cars, ['year'])
         return Response({"message": "Cars updated"})
 
+
+# to update different fields of multiple instances
 class CarBulkPatchView(APIView):
     def patch(self, request):
         cars = []
@@ -140,6 +136,9 @@ class CarBulkPatchView(APIView):
 
         return Response({"message": f"{len(cars)} cars updated"}, status=200)
 
+
+# to get data in bulk use .in_bulk() in post method
+# by posting ids the corresponding data is fetched
 class CarInBulkView(APIView):
     def post(self, request):
         cars = Car.objects.in_bulk(request.data['ids'])
@@ -149,15 +148,14 @@ class CarInBulkView(APIView):
         })
 
 
-
-
-
+# simply returns the number of instances
 class CarCountView(APIView):
     def get(self, request):
         count = Car.objects.count()
         return Response({"count": count})
 
 
+# to load large data in small chunks we use .iterator(chumk_size=)
 class CarIteratorView(APIView):
     def get(self, request):
         data = []
@@ -165,17 +163,23 @@ class CarIteratorView(APIView):
             data.append(CarSerializer(car).data)
         return Response(data)
 
+
+# to get the instance of the latest field (year) e.g 2026
 class CarLatestView(APIView):
     def get(self, request):
         car = Car.objects.latest('year')
         return Response(CarSerializer(car).data)
 
 
+# to get the instance of the earliest field (year) e.g 1990 or any year lesser
 class CarEarliestView(APIView):
     def get(self, request):
         car = Car.objects.earliest('year')
         return Response(CarSerializer(car).data)
 
+
+# to get the first entry of the table in db use .first()
+# to get the last entry of the table in db use .last()
 class CarFirstLastView(APIView):
     def get(self, request):
         return Response({
@@ -184,6 +188,7 @@ class CarFirstLastView(APIView):
         })
 
 
+# to get avg, minimum or maximum value we use .aggregate()
 class CarAggregateView(APIView):
     def get(self, request):
         result = Car.objects.aggregate(
@@ -193,14 +198,15 @@ class CarAggregateView(APIView):
         )
         return Response(result)
 
+
+# it returns a bool value after checking if the instance containing the specified value exists
 class CarExistsView(APIView):
     def get(self, request):
         exists = Car.objects.filter(make="Toyota").exists()
         return Response({"exists": exists})
 
 
-
-
+# .explains the flow at which the instance is fetched from the db
 class CarExplainView(APIView):
     def get(self, request):
         plan = Car.objects.filter(year__gte=2025).explain()

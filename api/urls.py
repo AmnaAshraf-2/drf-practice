@@ -1,7 +1,6 @@
 from django.urls import path
 from .views import (
     CarGetView,
-    CarRetrieveView,
     CarGetOneView,
     CarBulkPatchView,
     CarCountView,
@@ -9,7 +8,6 @@ from .views import (
     CarEarliestView,
     CarIteratorView,
     CarExplainView,
-    CarCreateView,
     CarCreateAPIView,
     CarDeleteView,
     CarExistsView,
@@ -27,7 +25,6 @@ urlpatterns = [
     path('get/', CarGetView.as_view()),
     path('delete/<int:pk>/', CarDeleteView.as_view(), name='delete'),
 
-    path('create/', CarCreateView.as_view()),
     path('createview/', CarCreateAPIView.as_view()),
     path('cg/', CarGetOrCreateView.as_view()),
     path('cu/', CarUpdateOrCreateView.as_view()),
@@ -37,7 +34,6 @@ urlpatterns = [
     path('bulkupdate/', CarBulkUpdateView.as_view()),
     path('bulkpatch/', CarBulkPatchView.as_view()),
 
-    path('get/<int:pk>/', CarRetrieveView.as_view()),
     path('getone/<int:id>/', CarGetOneView.as_view()),
 
     path('count/', CarCountView.as_view()),
