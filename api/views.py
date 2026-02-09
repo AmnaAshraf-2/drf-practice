@@ -24,6 +24,23 @@ class CarGetOneView(APIView):
         return Response(serializer.data)
 
 
+# Get all Toyotas using custom manager method
+class CarGetToyotasView(APIView):
+    def get(self, request):
+        cars = Car.car.by_make("Toyota")  # using custom manager method
+        serializer = CarSerializer(cars, many=True)
+        return Response(serializer.data)
+
+
+# Get all cars older than 2010 using custom manager method
+class CarGetOldCarsView(APIView):
+    def get(self, request):
+        cars = Car.car.older_than(2010)  # using custom manager method
+        serializer = CarSerializer(cars, many=True)
+        return Response(serializer.data)
+
+
+
 # use .get(id=pk) to display the item and .delete() to delete that item
 class CarDeleteView(APIView):
     def get(self,request,pk):

@@ -18,7 +18,9 @@ from .views import (
     CarInBulkView,
     CarUpdateOrCreateView,
     CarGetOrCreateView,
-    CarFirstLastView
+    CarFirstLastView,
+    CarGetToyotasView,
+    CarGetOldCarsView
 )
 
 urlpatterns = [
@@ -45,4 +47,7 @@ urlpatterns = [
     path('ag/', CarAggregateView.as_view()),
     path('exist/', CarExistsView.as_view()),
     path('explain/', CarExplainView.as_view()),
+
+    path('getToyota/', CarGetToyotasView.as_view()),
+    path('oldcar/', CarGetOldCarsView.as_view()),
 ]
