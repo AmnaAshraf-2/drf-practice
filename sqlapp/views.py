@@ -247,3 +247,62 @@ class CarExplainView(APIView):
             plan = cursor.fetchall()
 
         return Response({"query_plan": plan})
+
+
+class CarLatestView(APIView):
+    def get(self, request):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT id, name, year, price
+                FROM api_car
+                ORDER BY year DESC
+                LIMIT 1
+            """)
+            row = cursor.fetchone()
+
+        if not row:
+            return Response({"detail": "No car found"}, status=404)
+
+        return Response({
+            "id": row[0],
+            "name": row[1],
+            "year": row[2],
+            "price": row[3],
+        })
+
+
+class CarEarliestView(APIView):
+    def get(self, request):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT id, name, year, price
+                FROM api_car
+                ORDER BY year ASC
+                LIMIT 1
+            """)
+            row = cursor.fetchone()
+
+        if not row:
+            return Response({"detail": "No car found"}, status=404)
+
+        return Response({
+            "id": row[0],
+            "name": row[1],
+            "year": row[2],
+            "price": row[3],
+        })
+
+
+class CarFirstLastView(APIView):
+    def get(self, request):
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM api_car ORDER BY id ASC LIMIT 1")
+            first = cursor.fetchone()
+
+            cursor.execute("SELECT * FROM api_car ORDER BY id DESC LIMIT 1")
+            last = cursor.fetchone()
+
+        return Response({
+            "first": first,
+            "last": last
+        })

@@ -11,7 +11,10 @@ from .views import (
     CarUpdateOrCreateView,
     CarGetOrCreateView,
     CarBulkCreateView,
-    CarUpdateAPIView
+    CarUpdateAPIView,
+    CarEarliestView,
+    CarLatestView,
+    CarFirstLastView
 )
 
 
@@ -29,4 +32,7 @@ urlpatterns = [
     path('bulkcreatesql/', CarBulkCreateView.as_view()),
     path('gcsql/', CarGetOrCreateView.as_view()),
     path('updatesql/<int:id>/', CarUpdateAPIView.as_view()),
+    path('earlysql/', CarEarliestView.as_view()),
+    path('latestsql/', CarLatestView.as_view()),
+    path('firstlastsql/', CarFirstLastView.as_view()),
 ]
