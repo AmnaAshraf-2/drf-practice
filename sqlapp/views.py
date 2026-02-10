@@ -242,7 +242,7 @@ class CarExplainView(APIView):
         with connection.cursor() as cursor:
             cursor.execute(
                 "EXPLAIN ANALYZE SELECT * FROM api_car WHERE year >= %s",
-                [2025]
+                [2020]
             )
             plan = cursor.fetchall()
 
