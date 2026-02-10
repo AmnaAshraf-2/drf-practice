@@ -11,7 +11,12 @@ class CarGetView(APIView):
             rows = cursor.fetchall()
 
         data = [
-            {"id": r[0], "make": r[1], "model": r[2], "year": r[3]}
+            {
+                "id": r[0],
+                "make": r[1],
+                "model": r[2],
+                "year": r[3]
+            }
             for r in rows
         ]
         return Response(data)
@@ -253,7 +258,7 @@ class CarLatestView(APIView):
     def get(self, request):
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT id, name, year, price
+                SELECT id, make, model, year
                 FROM api_car
                 ORDER BY year DESC
                 LIMIT 1
@@ -275,7 +280,7 @@ class CarEarliestView(APIView):
     def get(self, request):
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT id, name, year, price
+                SELECT id, make, model, year
                 FROM api_car
                 ORDER BY year ASC
                 LIMIT 1
