@@ -98,15 +98,19 @@ class CarUpdateOrCreateView(APIView):
         })
 
 
-# this automaticaaly updates the year to 2025 of the cars having the name toyota
+# this automatically updates the year to 2025 of the cars having the name toyota
 class CarUpdateView(APIView):
-    def get(self,request):
-        car = Car.objects.filter(make="Toyota")
-        serializer = CarSerializer(car, many=True)
+    def get(self, request, id):
+        car = Car.objects.get(id=id)
+        serializer = CarSerializer(car)
         return Response(serializer.data)
 
-    def put(self, request):
-        updated = Car.objects.filter(make="Toyota").update(year=2025)
+    def put(self, request, id):
+        updated = Car.objects.filter(id=id).update(
+            make=request.data['make'],
+            model=request.data['model'],
+            year=request.data['year']
+        )
         return Response({"updated_rows": updated})
 
 
@@ -228,3 +232,4 @@ class CarExplainView(APIView):
     def get(self, request):
         plan = Car.objects.filter(year__gte=2025).explain()
         return Response({"query_plan": plan})
+

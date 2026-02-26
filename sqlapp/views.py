@@ -107,7 +107,8 @@ class CarUpdateAPIView(APIView):
                 [
                  request.data['make'],
                  request.data['model'],
-                 request.data['year']
+                 request.data['year'],
+                 [id]
                  ]
                            )
 
@@ -206,6 +207,55 @@ class CarBulkCreateView(APIView):
                 )
         return Response({"message": "Cars created"}, status=201)
 
+class CarBulkUpdateRawSQLView(APIView):
+    def put(self, request):
+        values = [
+            (item['id'], item['year'])
+            for item in request.data
+        ]
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE api_car AS c
+                SET year = v.year
+                FROM (
+                    VALUES %s
+                ) AS v(id, year)
+                WHERE c.id = v.id;
+                """,
+                [tuple(values)]
+            )
+
+        return Response({"message": "Cars updated"})
+
+
+class CarInBulkRawSQLView(APIView):
+    def post(self, request):
+        ids = tuple(request.data['ids'])
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id, make, model, year
+                FROM api_car
+                WHERE id IN %s
+                """,
+                [ids]
+            )
+            rows = cursor.fetchall()
+
+        data = {
+            row[0]: {
+                "id": row[0],
+                "make": row[1],
+                "model": row[2],
+                "year": row[3],
+            }
+            for row in rows
+        }
+
+        return Response(data)
 
 class CarCountView(APIView):
     def get(self, request):
@@ -311,3 +361,26 @@ class CarFirstLastView(APIView):
             "first": first,
             "last": last
         })
+
+
+class CarIteratorSQLView(APIView):
+    def get(self, request):
+        data = []
+
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT id, make, model, year FROM api_car")
+
+            while True:
+                rows = cursor.fetchmany(size=2)  # chunk_size = 2
+                if not rows:
+                    break
+
+                for r in rows:
+                    data.append({
+                        "id": r[0],
+                        "make": r[1],
+                        "model": r[2],
+                        "year": r[3],
+                    })
+
+        return Response(data)
